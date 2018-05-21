@@ -3,6 +3,11 @@ from pyspark.sql import SparkSession
 from pyspark.context import SparkContext
 import requests
 
+spark = SparkSession \
+        .builder \
+        .appName("GDELT_URL") \
+        .getOrCreate()
+
 def search_split(line):
  	if (line.find("//")> -1):
 	    domain=line.split("//")[1].split("/")[0]
@@ -33,16 +38,13 @@ def valid_urls(line):
             return (line,0)
 
 def readCSV():
-    global spark = SparkSession \
-        .builder \
-        .appName("GDELT_URL") \
-        .getOrCreate()
-
+    global spark;
     sc = SparkContext.getOrCreate()
     # Without limit, with all records it gives java.lang.OutOfMemoryError: Java heap space spark
     df = spark.read.csv('url.csv')#.limit(2000);  # <class 'pyspark.sql.dataframe.DataFrame'>
     #df.show(df.count())
-    print "count", df.count
+    # print "count", df.count()
+    print df.rdd.partitions.size
 
 def MR():
     df_rdd = df.rdd  # <class 'pyspark.rdd.RDD'>
@@ -64,6 +66,6 @@ if __name__ == "__main__":
         sys.exit(-1)
 
     readCSV()
-    MR()
+   # MR()
 
     spark.stop()
