@@ -22,15 +22,17 @@ def createDB():
     print spark.catalog.listDatabases()
 
 def createTB():
-    q = """CREATE TABLE testtable(country STRING, captital STRING, population INT)  USING PARQUET PARTITIONED BY (population)"""
+    #q = """CREATE TABLE database_kalinga.testtable  (country STRING, captital STRING, population INT)   PARTITIONED BY (population)"""
+    q = """CREATE TABLE testtable  (country STRING, captital STRING, population INT)"""
 
 #    q = "CREATE TABLE testtable(alpha_2 STRING, alpha_3 STRING, area INT, captital STRING, continent STRING, currency_code STRING ,currency_name STRING, eqivalent_fips_code STRING, fips STRING, geoname_id STRING, languages STRING, name STRING, neighbours STRING, numeric INT, phone INT, population INT, postal_code_format STRING, postal_code_regex STRING, tld STRING)"
  
     spark.sql(q)
-    spark.sql("insert into  testtable values('india', 'd', 100)")
 
-    spark.sql("DESCRIBE testtable")
+    spark.sql("show tables in database_kalinga").show()
     print spark.catalog.listTables()
+
+    spark.sql("""insert into  database_kalinga.testtable values('india', 'd', 100)""")
 
 def populateTB():
     df = spark.read.csv('countries.csv', header=True,sep=';').limit(20);
