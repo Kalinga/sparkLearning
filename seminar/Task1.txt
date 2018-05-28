@@ -1,0 +1,71 @@
+createdb database_kara9147sql database_kara9147CREATE TABLE students (
+        name VARCHAR(40) NOT NULL,
+        matrNo INTEGER NOT NULL,
+        course CHAR(25) NOT NULL)
+WITH PARTITION = (HASH ON matrNo 3 PARTITIONS)\ginfodb database_kara9147 insert into students  values ('Kalinga', 234, 'RCSE')                                        
+ insert into students  values ('KAAA', 235, 'RCSE') \g 
+ insert into students  values ('KAAB', 236, 'MEDIA') \g
+ insert into students  values ('KAAC', 237, 'MEDIA') \g   
+ insert into students  values ('KAAD', 238, 'MEDIA') \g 
+ insert into students  values ('KAAD', 239, 'Informatik') \g
+ insert into students  values ('KAAE', 240, 'Informatik') \g 
+ insert into students  values ('KAAF', 241, 'MEDIA') \g     
+ insert into students  values ('KAAF', 242, 'MEDIA') \g 
+ insert into students  values ('KAADF', 243, 'MEDIA') \g    
+ insert into students  values ('KAAGDF', 244, 'MEDIA') \g
+ insert into students  values ('KAAAL', 245, 'RCSE') \g     
+ insert into students  values ('KHAAALL', 246, 'RCSE') \g
+ insert into students  values ('KHAAALL', 247, 'RCSE') \g 
+ insert into students  values ('KHAAALIL', 248, 'RCSE') \g 
+ insert into students  values ('DKHAAALL', 249, 'RCSE') \g  
+ insert into students  values ('DKHAAALL', 250, 'RCSE') \g   
+ insert into students  values ('DKHXL', 251, 'RCSE') \g    
+ insert into students  values ('KAAGDFR', 252, 'MEDIA') \g
+ insert into students  values ('KAAGDFR', 253, 'MEDIA') \g 
+ insert into students  values ('KAAGDFR', 254, 'MEDIA') \g 
+ insert into students  values ('KAAGG', 255, 'MEDIA') \g   
+ insert into students  values ('KAAGG', 256, 'MEDIA') \g 
+ insert into students  values ('KAAGG', 257, 'MEDIA') \g 
+ insert into students  values ('KAAET', 258, 'Informatik') \g
+ insert into students  values ('KAAET', 260, 'Informatik') \g 
+ insert into students  values ('KAAET', 261, 'Informatik') \g 
+ insert into students  values ('KAAETH', 261, 'Informatik') \g
+ insert into students  values ('KAAETH', 262, 'Informatik') \g 
+ insert into students  values ('KAAH', 263, 'Informatik') \g   
+ insert into students  values ('KAAHU', 264, 'Informatik') \g
+ insert into students  values ('KAAHU', 265, 'Informatik') \g 
+ insert into students  values ('KAAGHU', 266, 'Informatik') \g
+ insert into students  values ('KAAGHU', 267, 'Informatik') \g 
+ insert into students  values ('DKKALL', 268, 'RCSE') \g      
+ insert into students  values ('DKKALL', 269, 'RCSE') \g 
+ insert into students  values ('DKRRLL', 270, 'RCSE') \g 
+ insert into students  values ('DKRRLL', 271, 'RCSE') \g 
+ insert into students  values ('DKLL~~RRLL', 272, 'RCSE') \g
+ insert into students  values ('DKLLRRLL', 272, 'RCSE') \g   
+ insert into students  values ('LRRLL', 273, 'RCSE') \g    
+ insert into students  values ('LRRLLF', 274, 'RCSE') \g
+ insert into students  values ('LRRLLF', 275, 'RCSE') \g
+
+SELECT tid/10000000000000000 AS partition_id, COUNT(*) AS num_tuples FROM students GROUP BY 1 ORDER BY 1 \g 
+
+spark-shell --driver-class-path /home/actian/spark_vector_loader-assembly-2.0-SNAPSHOT.jar
+
+
+
+scala> spark.sqlContext.sql("""CREATE TEMPORARY VIEW Rankings
+     | USING com.actian.spark_vector.sql.DefaultSource
+     | OPTIONS (
+     |     host "dbblade13.prakinf.tu-ilmenau.de",
+     |     instance "VH",
+     |     seperatorChar  ",",
+     |     database "database_kara9147",
+     |     table "Rankings"
+     | )""")
+18/05/28 23:35:27 ERROR VectorJDBC: Unable to retrieve metadata for table 'Rankings'
+java.sql.SQLSyntaxErrorException: Table 'rankings' does not exist or is not owned by you.
+	at com.ingres.gcf.util.SqlExType.getSqlEx(SqlExType.java:117)
+	at com.ingres.gcf.util.SqlExFactory.get(SqlExFactory.java:96)
+	at com.ingres.gcf.jdbc.DrvObj.readError(DrvObj.java:855)
+	at com.ingres.gcf.jdbc.DrvObj.readResults(DrvObj.java:639)
+	at com.ingres.gcf.jdbc.DrvPrep.prepare(DrvPrep.java:184)
+
