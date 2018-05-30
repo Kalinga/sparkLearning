@@ -8,45 +8,55 @@
 # All the functionality available with sparkContext are also available in sparkSession.
 
 import sys
+from pyspark import SparkContext
+from pyspark import SparkConf
 from pyspark.sql import SparkSession
+from pyspark.sql import SQLContext
+from pyspark.ml.feature import StopWordsRemover
+from pyspark.ml.feature import Tokenizer
+
 from pyspark.sql.functions import udf
 from pyspark.sql.types import StringType
+
 spark = SparkSession \
         .builder \
         .appName("wiki_articles") \
         .getOrCreate()
 
-def stopFilter(txt):
-    return "FilteredText"
+sc = spark.sparkContext 
 
-udfStopFilter=udf(stopFilter, StringType())
-
+#sqlContext = SQLContext(sc)
+#broadcastVar = sc.broadcast(stopList)
+#udfStopFilter=udf(stopFilter, StringType())
 #spark.udf.register("udfStopFilter", stopFilter)
 
 def readJSON():
     global spark;
+    global broadcastVar
     # Once the SparkSession is instantiated, we can configure Spark's run-time config properties.
     spark.conf.set("spark.sql.shuffle.partitions", 6)
     #spark.conf.set("spark.executor.memory", "2g")
 
     dfReader = spark.read
-    df = dfReader.json('/data/wikipedia/articles.json') #DataFrame[id: string, text: string, title: string, url: string]
+    df = dfReader.json('/data/wikipedia/articles.json').limit(10) #DataFrame[id: string, text: string, title: string, url: string]
     #df.show(df.count())
-    #df.show(40)
-    #print "count", df.count
+    #df.show()
+    print type( df)
     
     df_stop = spark.read.text('/data/stopwords.txt')
-    print df_stop;
-    df_stop.show()
-    print "count", df_stop.rdd.count()
-    print df_stop.printSchema()
     stopList = [s.value for s in df_stop.select('value').collect()]
-    """print stopList
-    for s in stopList:
-	print s"""
-    #new_df= df.withColumn("filteredTxt", stopFilter("text"))
-    new_df= df.withColumn("filteredTxt", udfStopFilter("text"))
-    new_df.show()
+#    print df_stop;
+#    df_stop.show()
+#    print "count", df_stop.rdd.count()
+#    print df_stop.printSchema()
+
+    tokernizer=Tokenizer(inputCol="text",outputCol="words" )
+    tokenized=tokernizer.transform(df)
+    tokenized.show()
+
+    remover = StopWordsRemover(inputCol="words", outputCol="filteredTxt", stopWords=stopList)
+    processedDF=remover.transform(tokenized)#.show(truncate=False)
+    processedDF.select("filteredTxt").show()
 
 def MR():
     df_rdd = df.rdd  # <class 'pyspark.rdd.RDD'>
