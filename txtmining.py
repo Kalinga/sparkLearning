@@ -38,7 +38,7 @@ def readJSON():
     #spark.conf.set("spark.executor.memory", "2g")
 
     dfReader = spark.read
-    df = dfReader.json('/data/wikipedia/articles.json').limit(1) #DataFrame[id: string, text: string, title: string, url: string]
+    df = dfReader.json('/data/wikipedia/articles.json').limit(10) #DataFrame[id: string, text: string, title: string, url: string]
     #df.show(df.count())
     #df.show()
     print type( df)
@@ -59,8 +59,16 @@ def readJSON():
     processedDF.select("filteredTxt").show()
 
     # TFIDF, short for term frequency-inverse document frequency
-    result = processedDF.rdd.map(lambda x: (str(x),1)).reduceByKey(lambda a, b: a + b).collect()
-    print "Top 10 frequently word"
+#    result = processedDF.rdd.flatMap(lambda x: x["filteredTxt"]).flatMap(lambda x: x.split()).map(lambda x: (str(x),1)).reduceByKey(lambda a, b: a + b).collect()
+#    result = processedDF.rdd.flatMap(lambda x: x["filteredTxt"]).map(lambda x: x.split()).map(lambda x: (str(x),1)).reduceByKey(lambda a, b: a + b).collect()
+    result = processedDF.rdd.flatMap(lambda x: x["filteredTxt"]).map(lambda x: x.split()).map(lambda x: (''.join(x),1)).reduceByKey(lambda a, b: a + b).collect()
+    print type(processedDF.rdd.flatMap(lambda x: x["filteredTxt"]).collect())
+    print type(processedDF.rdd.flatMap(lambda x: x["filteredTxt"]).map(lambda x: x.split()).collect())
+    print type (processedDF.rdd.flatMap(lambda x: x["filteredTxt"]).map(lambda x: x.split()).map(lambda x: (x,1)).collect())
+#    print result.count()
+#    print type(result)
+
+#    print "Top 10 frequently word"
     top10 = (sorted(result, key=lambda tup: tup[1], reverse=True))[0:10]
     print type(top10)
     print top10
