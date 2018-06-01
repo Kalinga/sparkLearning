@@ -12,7 +12,7 @@ from pyspark import SparkContext
 from pyspark import SparkConf
 from pyspark.sql import SparkSession
 from pyspark.sql import SQLContext
-from pyspark.ml.feature import StopWordsRemover
+from pyspark.ml.feature import StopWordsRemover,CountVectorizer
 from pyspark.ml.feature import HashingTF, IDF, Tokenizer
 
 from pyspark.sql.functions import udf
@@ -38,7 +38,7 @@ def readJSON():
     #spark.conf.set("spark.executor.memory", "2g")
 
     dfReader = spark.read
-    df = dfReader.json('/data/wikipedia/articles.json').limit(1) #DataFrame[id: string, text: string, title: string, url: string]
+    df = dfReader.json('/data/wikipedia/articles.json').limit(10) #DataFrame[id: string, text: string, title: string, url: string]
     #df.show(df.count())
     #df.show()
     print type( df)
@@ -50,13 +50,19 @@ def readJSON():
 #    print "count", df_stop.rdd.count()
 #    print df_stop.printSchema()
 
-    tokernizer = Tokenizer(inputCol="text",outputCol="words" )
-    wordsData = tokernizer.transform(df)
+    tokenizer = Tokenizer(inputCol="text",outputCol="words" )
+    wordsData = tokenizer.transform(df)
     wordsData.show(truncate = False)
 
     remover = StopWordsRemover(inputCol="words", outputCol="filteredTxt", stopWords=stopList)
     wordsData_NoStop = remover.transform(wordsData)#.show(truncate=False)
 #    processedDF.select("filteredTxt")#.show(truncate = False)
+
+    # fit a CountVectorizerModel from the corpus.
+    #cv = CountVectorizer(inputCol="words", outputCol="features", vocabSize=1<<20, minDF=2.0)
+    #model = cv.fit(df)
+    #result = model.transform(df)
+    #result.show(truncate=False)
     
     hashingTF = HashingTF(inputCol="filteredTxt", outputCol="rawFeatures", numFeatures=20)
     featurizedData = hashingTF.transform(wordsData_NoStop)
@@ -65,7 +71,7 @@ def readJSON():
     idfModel = idf.fit(featurizedData)
     rescaledData = idfModel.transform(featurizedData)
 
-    rescaledData.select("url", "features").show()
+    rescaledData.select("url", "features").show(truncate = False)
 
     # TFIDF, short for term frequency-inverse document frequency
 #    result = processedDF.rdd.flatMap(lambda x: x["filteredTxt"]).flatMap(lambda x: x.split()).map(lambda x: (str(x),1)).reduceByKey(lambda a, b: a + b).collect()
