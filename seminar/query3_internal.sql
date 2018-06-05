@@ -3,7 +3,7 @@ WITH output AS  (SELECT sourceIP,
           SUM(adRevenue) as totalRevenue
     FROM Rankings AS R, UserVisits AS UV
     WHERE R.pageURL = UV.destURL
-       AND UV.visitDate BETWEEN Date('1980-01-01') AND Date('1980-04-01')
+       AND UV.visitDate BETWEEN Date('1970-01-01') AND Date('1970-01-04')
     GROUP BY UV.sourceIP)
 
 SELECT sourceIP, totalRevenue, avgPageRank
