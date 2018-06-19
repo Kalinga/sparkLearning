@@ -55,7 +55,7 @@ object spatialData {
    	}
 
 	val sc = spark.sparkContext
-	val  df = sc.textFile("/data/world_level2.csv")
+	val df = sc.textFile("/data/world_level2.csv")
 	val df_clean = df.map(line => line.split(';')).filter((arr => arr.length==6))
 	val countries = df_clean.map(arr => (STObject(arr(5)), (arr(4)))) 
 	
@@ -65,10 +65,66 @@ object spatialData {
 
 	val geom_having_line  = countries.intersects(STObject("LINESTRING ( 1.4143211 42.5378868, 14.3443989 55.1476253 )")).map(arr => (arr._2) )
 	println(geom_having_line.collect().mkString("\n"))
+//--------------------------------------
 //Andorra                                                                         
 //Danmark
 //España
 //Deutschland
+//--------------------------------------
+
+val A = Array("9.363038", "56.079044")
+val B = Array("-3.385057", "48.347321")
+//C (15.641353, 40.924231)
+//D (31.569410, 38.767526)
+//E (33.466313, 49.500775)
+	val coordinateMap  = Map('A' -> "9.363038 56.079044", 'B' -> "-3.385057 48.347321",'C'->"15.641353 40.924231", 'D'->"31.569410 38.767526",'E'->"33.466313 49.500775")
+
+	// Consider the number of countries on the path as distance
+	// A=>B
+  
+        //val A_B  = countries.intersects(STObject("LINESTRING (" + A.mkString(" ") + "," + B.mkString(" ") + ")")).map(arr => (arr._2) )
+	//println(A_B.collect().mkString("\n"))
+	//val AB  = countries.intersects(STObject("LINESTRING (" + coordinateMap("A") + "," + coordinateMap("B")+ ")")).map(arr => (arr._2) )
+        //println(AB.collect().mkString("\n"))
+//Danmark                                                                         
+//Jersey
+//United Kingdom
+//Nederland
+	
+	val points = "ABCDE"
+	val pList = points.toList
+	//println(pList)
+	val paths = pList.permutations.toList
+	//println(paths)
+	var count = 0
+	var minCount:Long = 0
+	var optPath = ""
+	for (path <- paths) {
+		var _path = count + ":" + path.mkString(" -> ")
+		//println(_path)
+		count += 1
+	
+		var multiLine = new ListBuffer[String]()
+		for (point <- path) {
+		        multiLine += coordinateMap(point)
+    		}
+		
+		var _countries = countries.intersects(STObject("LINESTRING ("+multiLine.toList.mkString(",")+")")).map(arr => (arr._2) )
+		var _countries_count = _countries.count()
+		println (_countries.collect().mkString(","))
+		println (_countries_count)
+		if(0 == minCount)
+			minCount = _countries_count
+		else if (_countries_count < minCount)
+			minCount = _countries_count
+			optPath = _path
+		
+	}
+	println(optPath)
+        println(minCount)
+
   }
+
+
 
 }
