@@ -99,6 +99,7 @@ val B = Array("-3.385057", "48.347321")
 	var count = 0
 	var minCount:Long = 0
 	var optPath = ""
+	var _countries_list = ""
 	for (path <- paths) {
 		var _path = count + ":" + path.mkString(" -> ")
 		//println(_path)
@@ -111,17 +112,26 @@ val B = Array("-3.385057", "48.347321")
 		
 		var _countries = countries.intersects(STObject("LINESTRING ("+multiLine.toList.mkString(",")+")")).map(arr => (arr._2) )
 		var _countries_count = _countries.count()
-		println (_countries.collect().mkString(","))
-		println (_countries_count)
-		if(0 == minCount)
+		var _cList = ( _countries.collect().mkString(","))
+		println(_cList)
+		println(_countries_count)
+		if(0 == minCount) {
 			minCount = _countries_count
-		else if (_countries_count < minCount)
+			_countries_list = _cList
+		}
+		else if (_countries_count < minCount) {
 			minCount = _countries_count
 			optPath = _path
+			_countries_list = _cList
+		}
 		
 	}
+
+	println("------------------------------------------------------------------------")
 	println(optPath)
         println(minCount)
+	println(_countries_list)
+	println("------------------------------------------------------------------------")
 
   }
 
