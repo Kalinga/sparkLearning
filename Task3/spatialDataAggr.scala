@@ -1,5 +1,4 @@
-// scalac -d spatialDataAggr.jar -cp .:/usr/local/spark/jars/*:/usr/local/stark/stark.jar spatialDataAggr.scala
-// spark-submit --master yarn --jars /usr/local/stark/stark.jar --class spatialData spatialDataAggr.jar
+// scalac -d spatialDataAggr.jar -cp .:/usr/local/spark/jars/*:/usr/local/stark/stark.jar spatialDataAggr.scala && spark-submit --master yarn --jars /usr/local/stark/stark.jar --class spatialData spatialDataAggr.jar
 
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.SparkContext
@@ -23,7 +22,7 @@ object spatialDataAggr {
           .getOrCreate()
 
         println("spatialData Aggr!")
-//        val datafs = spark.read.option("delimiter", "\t").csv("/data/gdelt/events_2013-04-01_TO_2015-10-18.tsv")
+//        val datafs = spark.read.option("delimiter", "\t").csv("/data/gdelt/events_2013-04-01_TO_2015-10-18.tsv").take(1000)
 //        val datafs_cols_46_47 = datafs.select(col("_c46"), col("_c47"))
 //        datafs_cols_46_47.show()
 
@@ -40,22 +39,37 @@ object spatialDataAggr {
 
 	val sc = spark.sparkContext
 	val df = sc.textFile("/data/world_level2.csv")
+	//df.foreach(println)
 	val df_clean = df.map(line => line.split(';')).filter((arr => arr.length==6))
-	val countries = df_clean.map(arr => (STObject(arr(5)), (arr(4)))) 
 
+//+---+---+-------+---+--------------------+--------------------+
+//|_c0|_c1|    _c2|_c3|                 _c4|                 _c5|
+//+---+---+-------+---+--------------------+--------------------+
+//|Cid| ??|????   |???|Country Name        |Country Map MPolygon|
+
+	val countries = df_clean.map(arr => (STObject(arr(5)), (arr(0).toInt,arr(4))))
+
+//	for (c <- countries) {
+//	    println(c._2)
+//       }
+
+//	System.exit(0)
 	val gdelt = sc.textFile("/data/gdelt/events_2013-04-01_TO_2015-10-18.tsv").map(line => line.split('\t')).filter(arr => arr(46).length > 0 )
 
-	val gdelt_event_points = gdelt.map(arr => (STObject("POINT ( "+arr(46)+" "+arr(47)+" )"), (arr(0).toInt, arr(51)) ))
+	val gdelt_event_points = gdelt.map(arr => (STObject("POINT ( " + arr(46) + " " + arr(47) + " )"), (arr(0).toInt, arr(51)) ))
+
+	// dimensions=2, lat, long
 	val gridPartitioner = new SpatialGridPartitioner(rdd=gdelt_event_points, partitionsPerDimension=10, pointsOnly=true, dimensions=2)
 	val gdelt_partitioned = gdelt_event_points.partitionBy(gridPartitioner)
-	
-	//val gridPartitioner = new SpatialGridPartitioner(countries, partitionsPerDimension = 10)
-	//val partionedCountries = countries.partitionBy(gridPartitioner)
+
+	val cids = df_clean.map(arr => arr(0).toInt).collect()
+	for (cid <- cids) {
+	    var country = countries.filter(arr => arr._2._1==cid).first()
+	    println(country._2._2,gdelt_partitioned.containedby(country._1).count())
+	}
 
 	
-	// find all geometries that contain the given point 
-	//val geom_having_point = partionedCountries.contains(STObject("POINT(1.4143211 42.5378868)"))
-	//println(geom_having_point.map(arr=>arr._2).collect().mkString("\n")) // No Output!
+	
 
 	//val geom_having_line  = partionedCountries.intersects(STObject("LINESTRING ( 1.4143211 42.5378868, 14.3443989 55.1476253 )")).map(arr => (arr._2) )
 	//println(geom_having_line.collect().mkString("\n"))
