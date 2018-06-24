@@ -1,0 +1,91 @@
+scalac -d spatialDataAggr.jar -cp .:/usr/local/spark/jars/*:/usr/local/stark/stark.jar spatialDataAggr.scala && spark-submit --master yarn --jars /usr/local/stark/stark.jar --class spatialDataAggr spatialDataAggr.jar 
+spatialData Aggr!
+18/06/24 11:36:29 ERROR YarnScheduler: Lost executor 2 on dbblade15.prakinf.tu-ilmenau.de: Container marked as failed: container_1528188921975_0494_01_000003 on host: dbblade15.prakinf.tu-ilmenau.de. Exit status: 143. Diagnostics: Container killed on request. Exit code is 143
+Container exited with a non-zero exit code 143
+Killed by external signal
+
+18/06/24 11:38:26 ERROR YarnScheduler: Lost executor 1 on dbblade16.prakinf.tu-ilmenau.de: Container marked as failed: container_1528188921975_0494_01_000002 on host: dbblade16.prakinf.tu-ilmenau.de. Exit status: 143. Diagnostics: Container killed on request. Exit code is 143
+Container exited with a non-zero exit code 143
+Killed by external signal
+
+[Stage 30:=====================================================>(359 + 1) / 360]18/06/24 11:50:55 ERROR YarnScheduler: Lost executor 3 on dbblade10.prakinf.tu-ilmenau.de: Executor heartbeat timed out after 127042 ms
+[Stage 30:>                                                       (0 + 0) / 209]18/06/24 11:50:58 ERROR YarnScheduler: Lost executor 3 on dbblade10.prakinf.tu-ilmenau.de: Container container_1528188921975_0494_01_000004 exited from explicit termination request.
+[Stage 30:=====================================================>(208 + 1) / 209]18/06/24 11:56:25 ERROR YarnScheduler: Lost executor 5 on dbblade14.prakinf.tu-ilmenau.de: Container marked as failed: container_1528188921975_0494_01_000006 on host: dbblade14.prakinf.tu-ilmenau.de. Exit status: 143. Diagnostics: Container killed on request. Exit code is 143
+Container exited with a non-zero exit code 143
+Killed by external signal
+
+18/06/24 11:56:32 ERROR TransportClient: Failed to send RPC 7752907591202191038 to /172.21.249.76:41710: java.nio.channels.ClosedChannelException
+java.nio.channels.ClosedChannelException
+	at io.netty.channel.AbstractChannel$AbstractUnsafe.write(...)(Unknown Source)
+18/06/24 11:56:32 ERROR YarnScheduler: Lost executor 4 on dbblade09.prakinf.tu-ilmenau.de: Slave lost
+[Stage 30:=====================================================>(359 + 1) / 360]Exception in thread "main" org.apache.spark.SparkException: Job aborted due to stage failure: ResultStage 31 (count at spatialDataAggr.scala:59) has failed the maximum allowable number of times: 4. Most recent failure reason: org.apache.spark.shuffle.FetchFailedException: /tmp/hadoop-hduser/nm-local-dir/usercache/kara9147/appcache/application_1528188921975_0494/blockmgr-a3b61c45-2bb9-43ca-9c0c-7f5e47ad73f2/30/shuffle_0_0_0.index (No such file or directory)
+	at org.apache.spark.storage.ShuffleBlockFetcherIterator.throwFetchFailedException(ShuffleBlockFetcherIterator.scala:357)
+	at org.apache.spark.storage.ShuffleBlockFetcherIterator.next(ShuffleBlockFetcherIterator.scala:332)
+	at org.apache.spark.storage.ShuffleBlockFetcherIterator.next(ShuffleBlockFetcherIterator.scala:54)
+	at scala.collection.Iterator$$anon$11.next(Iterator.scala:409)
+	at scala.collection.Iterator$$anon$12.nextCur(Iterator.scala:434)
+	at scala.collection.Iterator$$anon$12.hasNext(Iterator.scala:440)
+	at scala.collection.Iterator$$anon$11.hasNext(Iterator.scala:408)
+	at org.apache.spark.util.CompletionIterator.hasNext(CompletionIterator.scala:32)
+	at org.apache.spark.InterruptibleIterator.hasNext(InterruptibleIterator.scala:39)
+	at scala.collection.Iterator$class.foreach(Iterator.scala:893)
+	at org.apache.spark.InterruptibleIterator.foreach(InterruptibleIterator.scala:28)
+	at dbis.stark.spatial.SpatialFilterRDD.compute(SpatialFilterRDD.scala:146)
+	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:323)
+	at org.apache.spark.rdd.RDD.iterator(RDD.scala:287)
+	at org.apache.spark.scheduler.ResultTask.runTask(ResultTask.scala:87)
+	at org.apache.spark.scheduler.Task.run(Task.scala:99)
+	at org.apache.spark.executor.Executor$TaskRunner.run(Executor.scala:282)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+Caused by: java.io.FileNotFoundException: /tmp/hadoop-hduser/nm-local-dir/usercache/kara9147/appcache/application_1528188921975_0494/blockmgr-a3b61c45-2bb9-43ca-9c0c-7f5e47ad73f2/30/shuffle_0_0_0.index (No such file or directory)
+	at java.io.FileInputStream.open0(Native Method)
+	at java.io.FileInputStream.open(FileInputStream.java:195)
+	at java.io.FileInputStream.<init>(FileInputStream.java:138)
+	at org.apache.spark.shuffle.IndexShuffleBlockResolver.getBlockData(IndexShuffleBlockResolver.scala:199)
+	at org.apache.spark.storage.BlockManager.getBlockData(BlockManager.scala:302)
+	at org.apache.spark.storage.ShuffleBlockFetcherIterator.fetchLocalBlocks(ShuffleBlockFetcherIterator.scala:258)
+	at org.apache.spark.storage.ShuffleBlockFetcherIterator.initialize(ShuffleBlockFetcherIterator.scala:292)
+	at org.apache.spark.storage.ShuffleBlockFetcherIterator.<init>(ShuffleBlockFetcherIterator.scala:120)
+	at org.apache.spark.shuffle.BlockStoreShuffleReader.read(BlockStoreShuffleReader.scala:45)
+	at org.apache.spark.rdd.ShuffledRDD.compute(ShuffledRDD.scala:109)
+	at org.apache.spark.rdd.RDD.computeOrReadCheckpoint(RDD.scala:323)
+	at org.apache.spark.rdd.RDD.iterator(RDD.scala:287)
+	... 9 more
+
+	at org.apache.spark.scheduler.DAGScheduler.org$apache$spark$scheduler$DAGScheduler$$failJobAndIndependentStages(DAGScheduler.scala:1435)
+	at org.apache.spark.scheduler.DAGScheduler$$anonfun$abortStage$1.apply(DAGScheduler.scala:1423)
+	at org.apache.spark.scheduler.DAGScheduler$$anonfun$abortStage$1.apply(DAGScheduler.scala:1422)
+	at scala.collection.mutable.ResizableArray$class.foreach(ResizableArray.scala:59)
+	at scala.collection.mutable.ArrayBuffer.foreach(ArrayBuffer.scala:48)
+	at org.apache.spark.scheduler.DAGScheduler.abortStage(DAGScheduler.scala:1422)
+	at org.apache.spark.scheduler.DAGScheduler.handleTaskCompletion(DAGScheduler.scala:1262)
+	at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.doOnReceive(DAGScheduler.scala:1647)
+	at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.onReceive(DAGScheduler.scala:1605)
+	at org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.onReceive(DAGScheduler.scala:1594)
+	at org.apache.spark.util.EventLoop$$anon$1.run(EventLoop.scala:48)
+	at org.apache.spark.scheduler.DAGScheduler.runJob(DAGScheduler.scala:628)
+	at org.apache.spark.SparkContext.runJob(SparkContext.scala:1918)
+	at org.apache.spark.SparkContext.runJob(SparkContext.scala:1931)
+	at org.apache.spark.SparkContext.runJob(SparkContext.scala:1944)
+	at org.apache.spark.SparkContext.runJob(SparkContext.scala:1958)
+	at org.apache.spark.rdd.RDD.count(RDD.scala:1157)
+	at spatialDataAggr$$anonfun$world_level$1.apply$mcVI$sp(spatialDataAggr.scala:59)
+	at spatialDataAggr$$anonfun$world_level$1.apply(spatialDataAggr.scala:57)
+	at spatialDataAggr$$anonfun$world_level$1.apply(spatialDataAggr.scala:57)
+	at scala.collection.IndexedSeqOptimized$class.foreach(IndexedSeqOptimized.scala:33)
+	at scala.collection.mutable.ArrayOps$ofInt.foreach(ArrayOps.scala:234)
+	at spatialDataAggr$.world_level(spatialDataAggr.scala:57)
+	at spatialDataAggr$.main(spatialDataAggr.scala:29)
+	at spatialDataAggr.main(spatialDataAggr.scala)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.apache.spark.deploy.SparkSubmit$.org$apache$spark$deploy$SparkSubmit$$runMain(SparkSubmit.scala:738)
+	at org.apache.spark.deploy.SparkSubmit$.doRunMain$1(SparkSubmit.scala:187)
+	at org.apache.spark.deploy.SparkSubmit$.submit(SparkSubmit.scala:212)
+	at org.apache.spark.deploy.SparkSubmit$.main(SparkSubmit.scala:126)
+	at org.apache.spark.deploy.SparkSubmit.main(SparkSubmit.scala)
+
