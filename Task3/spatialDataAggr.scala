@@ -61,7 +61,7 @@ object spatialDataAggr {
 	}
 	
 	val sorted = ListMap(country_event_count.toSeq.sortWith(_._1 > _._1):_*)
-	sorted.drop(3).foreach(println)
+	sorted.take(3).foreach(println)
 	
   } // world_level
 
