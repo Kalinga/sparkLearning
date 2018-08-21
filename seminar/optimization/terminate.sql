@@ -1,0 +1,2 @@
+call vectorwise(terminate) \g
+
